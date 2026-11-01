@@ -1,21 +1,16 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    Calendar,
     ChevronRight,
     Facebook,
-    Flame,
     Instagram,
     Mail,
     MapPin,
-    Menu,
     Phone,
-    Shield,
-    Trophy,
-    Users,
-    X,
     Youtube,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
+
+import PublicHeader from '@/components/public-header';
 
 interface SharedProps {
     clubSettings?: {
@@ -46,7 +41,6 @@ export default function PublicLayout({
     title?: string;
 }) {
     const { props } = usePage<{ [key: string]: any } & SharedProps>();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const clubSettings = props.clubSettings || {
         name: 'Paksi FC',
@@ -60,174 +54,10 @@ export default function PublicLayout({
         tiktok: 'https://tiktok.com/@paksifc',
     };
 
-    const navLinks = [
-        { label: 'Főoldal', href: '/' },
-        { label: 'Hírek', href: '/hirek' },
-        { label: 'Csapat', href: '/csapat' },
-        { label: 'Mérkőzések', href: '/merkozesek' },
-        { label: 'Tabella', href: '/tabella' },
-        { label: 'Média', href: '/media' },
-        { label: 'Támogatók', href: '/tamogatok' },
-        { label: 'Stadion', href: '/stadion' },
-        { label: 'Kapcsolat', href: '/kapcsolat' },
-    ];
-
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-emerald-700 selection:text-white">
-            {/* Top Bar */}
-            <div className="bg-[#0b2416] text-emerald-100 text-xs py-2 px-4 sm:px-8 border-b border-emerald-900/60">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <span className="font-semibold tracking-wider text-amber-400 uppercase flex items-center gap-1.5">
-                            <Shield className="w-3.5 h-3.5 text-amber-400" />
-                            {clubSettings.tagline}
-                        </span>
-                        <span className="hidden md:inline text-emerald-400/60">|</span>
-                        <span className="hidden md:inline-flex items-center gap-1 text-emerald-300">
-                            <MapPin className="w-3 h-3" /> {clubSettings.address}
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2.5">
-                            <a
-                                href={clubSettings.facebook}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="hover:text-amber-400 transition"
-                                title="Facebook"
-                            >
-                                <Facebook className="w-3.5 h-3.5" />
-                            </a>
-                            <a
-                                href={clubSettings.instagram}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="hover:text-amber-400 transition"
-                                title="Instagram"
-                            >
-                                <Instagram className="w-3.5 h-3.5" />
-                            </a>
-                            <a
-                                href={clubSettings.youtube}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="hover:text-amber-400 transition"
-                                title="YouTube"
-                            >
-                                <Youtube className="w-3.5 h-3.5" />
-                            </a>
-                        </div>
-                        <span className="text-emerald-400/60">|</span>
-                        <a
-                            href="/admin"
-                            className="text-amber-300 hover:text-white font-medium transition flex items-center gap-1"
-                        >
-                            Админка (Filament)
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Header / Navigation */}
-            <header className="sticky top-0 z-50 bg-[#006B3F] text-white shadow-xl shadow-emerald-950/20 border-b border-emerald-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
-                    {/* Club Logo & Brand */}
-                    <Link href="/" className="flex items-center gap-3.5 group">
-                        <div className="w-13 h-13 rounded-2xl bg-white p-1.5 shadow-md shadow-emerald-950/30 flex items-center justify-center transform group-hover:scale-105 transition">
-                            <div className="w-full h-full rounded-xl bg-[#006B3F] border-2 border-amber-400 flex flex-col items-center justify-center text-white font-black leading-none">
-                                <span className="text-[10px] tracking-widest text-amber-300">PAKSI</span>
-                                <span className="text-base font-extrabold text-white">FC</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                <span className="font-black text-2xl tracking-tight text-white group-hover:text-amber-300 transition">
-                                    PAKSI FC
-                                </span>
-                                <span className="bg-amber-400 text-emerald-950 text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded tracking-wider">
-                                    1952
-                                </span>
-                            </div>
-                            <span className="text-xs text-emerald-200 font-medium tracking-wide">
-                                A MAGYAR CSAPAT
-                            </span>
-                        </div>
-                    </Link>
-
-                    {/* Desktop Navigation */}
-                    <nav className="hidden xl:flex items-center gap-1">
-                        {navLinks.map((item) => {
-                            const isActive =
-                                item.href === '/'
-                                    ? currentPath === '/'
-                                    : currentPath.startsWith(item.href);
-
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={`px-3.5 py-2 rounded-lg text-sm font-bold tracking-wide transition relative ${isActive
-                                        ? 'text-white bg-emerald-900/60 shadow-inner'
-                                        : 'text-emerald-100 hover:text-white hover:bg-emerald-700/60'
-                                        }`}
-                                >
-                                    {item.label}
-                                    {isActive && (
-                                        <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-amber-400 rounded-full" />
-                                    )}
-                                </Link>
-                            );
-                        })}
-                    </nav>
-
-                    {/* Action buttons */}
-                    <div className="hidden lg:flex items-center gap-3">
-                        <Link
-                            href="/merkozesek"
-                            className="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black text-xs uppercase px-4 py-2.5 rounded-xl shadow-md transition transform hover:-translate-y-0.5 flex items-center gap-1.5"
-                        >
-                            <Calendar className="w-3.5 h-3.5" />
-                            Meccsek
-                        </Link>
-                    </div>
-
-                    {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="xl:hidden p-2 rounded-xl text-emerald-100 hover:text-white hover:bg-emerald-700 focus:outline-none"
-                        aria-label="Menü"
-                    >
-                        {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-                    </button>
-                </div>
-
-                {/* Mobile Dropdown Menu */}
-                {mobileMenuOpen && (
-                    <div className="xl:hidden bg-[#07331e] border-t border-emerald-800 px-4 pt-3 pb-6 space-y-1">
-                        {navLinks.map((item) => (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="block px-4 py-2.5 rounded-lg text-base font-bold text-white hover:bg-emerald-700/70"
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
-                        <div className="pt-4 border-t border-emerald-800/80 flex flex-col gap-2">
-                            <a
-                                href="/admin"
-                                className="block text-center py-2.5 bg-amber-400 text-emerald-950 rounded-lg font-bold text-sm"
-                            >
-                                Vezérlőpult (Adminisztráció)
-                            </a>
-                        </div>
-                    </div>
-                )}
-            </header>
+            {/* Header: Company logo on the left (vertically centered), 2-level layout on the right (utility bar & navigation menu) */}
+            <PublicHeader clubSettings={clubSettings} navigation={props.navigation} />
 
             {/* Page Content */}
             <main className="flex-1">{children}</main>
@@ -382,4 +212,3 @@ export default function PublicLayout({
         </div>
     );
 }
-
