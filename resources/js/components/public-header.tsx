@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
     Calendar,
+    ChevronDown,
     Facebook,
     Globe,
     Instagram,
@@ -16,11 +17,10 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuList,
-    navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Separator } from '@/components/ui/separator';
 import {
     Sheet,
@@ -52,8 +52,19 @@ export interface ClubSettings {
 export interface NavigationItem {
     id?: number;
     title: string;
-    url?: string;
-    route_name?: string;
+    url?: string | null;
+    route_name?: string | null;
+    resolved_url?: string;
+    opens_in_new_tab?: boolean;
+    children?: NavigationItem[];
+}
+
+export interface NavItem {
+    id?: number;
+    label: string;
+    href: string;
+    target?: string;
+    children?: NavItem[];
 }
 
 interface PublicHeaderProps {
@@ -76,17 +87,76 @@ function TikTokIcon({ className }: { className?: string }) {
     );
 }
 
-const defaultNavLinks = [
+const defaultNavLinks: NavItem[] = [
     { label: 'Főoldal', href: '/' },
     { label: 'Hírek', href: '/hirek' },
-    { label: 'Csapat', href: '/csapat' },
-    { label: 'Mérkőzések', href: '/merkozesek' },
+    {
+        label: 'Csapat',
+        href: '/csapat',
+        children: [
+            { label: 'Első csapat', href: '/csapat' },
+            { label: 'Szakmai stáb', href: '/csapat#stab' },
+        ],
+    },
+    {
+        label: 'Mérkőzések',
+        href: '/merkozesek',
+        children: [
+            { label: 'Mérkőzések & Eredmények', href: '/merkozesek' },
+            { label: 'Tabella', href: '/tabella' },
+        ],
+    },
     { label: 'Tabella', href: '/tabella' },
     { label: 'Média', href: '/media' },
-    { label: 'Támogatók', href: '/tamogatok' },
+    {
+        label: 'Klub',
+        href: '/tortenet',
+        children: [
+            { label: 'Történet', href: '/tortenet' },
+            { label: 'Stadion', href: '/stadion' },
+            { label: 'Támogatók', href: '/tamogatok' },
+        ],
+    },
     { label: 'Stadion', href: '/stadion' },
     { label: 'Kapcsolat', href: '/kapcsolat' },
 ];
+
+const routeNameToUrl: Record<string, string> = {
+    'home': '/',
+    'articles.index': '/hirek',
+    'team.index': '/csapat',
+    'matches.index': '/merkozesek',
+    'standings.index': '/tabella',
+    'galleries.index': '/media',
+    'sponsors.index': '/tamogatok',
+};
+
+function resolveItemHref(item: NavigationItem): string {
+    if (item.resolved_url) {
+        return item.resolved_url;
+    }
+    if (item.url) {
+        return item.url;
+    }
+    if (item.route_name) {
+        if (routeNameToUrl[item.route_name]) {
+            return routeNameToUrl[item.route_name];
+        }
+        return `/${item.route_name.replace(/^\//, '')}`;
+    }
+    return '#';
+}
+
+function mapNavigationItem(item: NavigationItem): NavItem {
+    const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+    return {
+        id: item.id,
+        label: item.title,
+        href: resolveItemHref(item),
+        target: item.opens_in_new_tab ? '_blank' : undefined,
+        children: hasChildren ? item.children!.map(mapNavigationItem) : undefined,
+    };
+}
 
 export function PublicHeader({ clubSettings: initialClubSettings, navigation }: PublicHeaderProps) {
     const page = usePage();
@@ -105,18 +175,35 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
         tiktok: initialClubSettings?.tiktok || 'https://tiktok.com/@paksifc',
     };
 
-    const navItems = navigation?.header && navigation.header.length > 0
-        ? navigation.header.map((item) => ({
-            label: item.title,
-            href: item.url || (item.route_name ? `/${item.route_name.replace(/^\//, '')}` : '/'),
-        }))
-        : defaultNavLinks;
+    const navItems: NavItem[] =
+        navigation?.header && navigation.header.length > 0
+            ? navigation.header.map(mapNavigationItem)
+            : defaultNavLinks;
 
     const isLinkActive = (href: string) => {
-        if (href === '/') {
-            return currentPath === '/' || currentPath === '';
+        if (!href || href === '#') {
+            return false;
         }
-        return currentPath.startsWith(href);
+        const cleanHref = href.split('?')[0].split('#')[0];
+        const cleanCurrentPath = currentPath.split('?')[0].split('#')[0];
+
+        if (cleanHref === '/') {
+            return cleanCurrentPath === '/' || cleanCurrentPath === '';
+        }
+        return (
+            cleanCurrentPath === cleanHref ||
+            cleanCurrentPath.startsWith(`${cleanHref}/`)
+        );
+    };
+
+    const isItemOrChildActive = (item: NavItem): boolean => {
+        if (isLinkActive(item.href)) {
+            return true;
+        }
+        if (item.children && item.children.length > 0) {
+            return item.children.some((child) => isItemOrChildActive(child));
+        }
+        return false;
     };
 
     return (
@@ -290,29 +377,97 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
 
                         {/* Bottom row: Main navigation menu */}
                         <div className="flex w-full items-center justify-between py-2">
-                            <NavigationMenu className="max-w-none flex-1 justify-start">
-                                <NavigationMenuList className="flex-wrap gap-1">
-                                    {navItems.map((item) => {
-                                        const active = isLinkActive(item.href);
+                            <nav className="flex flex-1 items-center justify-start gap-1 flex-wrap">
+                                {navItems.map((item, idx) => {
+                                    const hasChildren = Boolean(item.children && item.children.length > 0);
+                                    const active = isItemOrChildActive(item);
+                                    const itemKey = item.id ? String(item.id) : `nav-${idx}`;
+
+                                    if (hasChildren) {
                                         return (
-                                            <NavigationMenuItem key={item.href}>
+                                            <div
+                                                key={itemKey}
+                                                className="relative group inline-flex items-center"
+                                            >
                                                 <Link
-                                                    href={item.href}
+                                                    href={item.href || '#'}
+                                                    target={item.target}
                                                     className={cn(
-                                                        navigationMenuTriggerStyle(),
-                                                        'h-8 px-3 text-xs font-semibold tracking-wide transition-colors',
+                                                        'inline-flex h-8 items-center justify-center gap-1 rounded-md px-3 text-xs font-semibold tracking-wide transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring select-none',
                                                         active
-                                                            ? 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 hover:text-primary-foreground'
-                                                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                            ? 'bg-primary text-primary-foreground shadow-xs'
+                                                            : 'text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground'
                                                     )}
                                                 >
-                                                    {item.label}
+                                                    <span>{item.label}</span>
+                                                    <ChevronDown
+                                                        className="size-3 text-muted-foreground transition-transform duration-200 group-hover:rotate-180 group-hover:text-foreground"
+                                                        aria-hidden="true"
+                                                    />
                                                 </Link>
-                                            </NavigationMenuItem>
+
+                                                {/* Dropdown panel - precisely aligned to left (left-0), with pt-1.5 bridge to prevent hover loss */}
+                                                <div className="absolute left-0 top-full pt-1.5 z-50 pointer-events-none opacity-0 translate-y-1 transition-all duration-150 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-focus-within:translate-y-0">
+                                                    <div className="min-w-[280px] w-max max-w-md p-1.5 shadow-xl border border-border/80 bg-popover text-popover-foreground rounded-lg">
+                                                        <div className="flex flex-col gap-0.5 text-left">
+                                                            {item.href && item.href !== '#' && (
+                                                                <>
+                                                                    <Link
+                                                                        href={item.href}
+                                                                        target={item.target}
+                                                                        className={cn(
+                                                                            'flex w-full items-center justify-between gap-3 text-left rounded-md px-3 py-2 text-xs font-bold transition-colors hover:bg-accent hover:text-accent-foreground',
+                                                                            isLinkActive(item.href) && 'bg-primary/10 text-primary'
+                                                                        )}
+                                                                    >
+                                                                        <span className="text-left">{item.label}</span>
+                                                                        <Badge variant="secondary" className="text-[10px] py-0 px-2 font-normal shrink-0">
+                                                                            Főoldal
+                                                                        </Badge>
+                                                                    </Link>
+                                                                    <Separator className="my-1" />
+                                                                </>
+                                                            )}
+                                                            {item.children!.map((child, childIdx) => {
+                                                                const childActive = isLinkActive(child.href);
+                                                                return (
+                                                                    <Link
+                                                                        key={child.id ?? `child-${childIdx}`}
+                                                                        href={child.href}
+                                                                        target={child.target}
+                                                                        className={cn(
+                                                                            'flex w-full items-center justify-start text-left gap-3 rounded-md px-3 py-2 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                                                                            childActive && 'bg-primary/10 text-primary font-bold'
+                                                                        )}
+                                                                    >
+                                                                        <span className="text-left leading-snug">{child.label}</span>
+                                                                    </Link>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         );
-                                    })}
-                                </NavigationMenuList>
-                            </NavigationMenu>
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={itemKey}
+                                            href={item.href}
+                                            target={item.target}
+                                            className={cn(
+                                                'inline-flex h-8 items-center justify-center rounded-md px-3 text-xs font-semibold tracking-wide transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring select-none',
+                                                active
+                                                    ? 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90'
+                                                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                            )}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    );
+                                })}
+                            </nav>
 
                             {/* Action CTA button */}
                             <div className="ml-4 flex shrink-0 items-center gap-2">
@@ -380,12 +535,108 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
 
                                     {/* Navigation links */}
                                     <nav className="flex flex-col space-y-1">
-                                        {navItems.map((item) => {
+                                        {navItems.map((item, idx) => {
+                                            const hasChildren = Boolean(item.children && item.children.length > 0);
                                             const active = isLinkActive(item.href);
+                                            const childOrItemActive = isItemOrChildActive(item);
+
+                                            if (hasChildren) {
+                                                return (
+                                                    <Collapsible
+                                                        key={item.id ?? `mobile-nav-${idx}`}
+                                                        defaultOpen={childOrItemActive}
+                                                        className="group/collapsible w-full"
+                                                    >
+                                                        <div
+                                                            className={cn(
+                                                                'flex items-center justify-between rounded-md px-1 py-0.5 text-sm font-semibold transition-colors',
+                                                                active
+                                                                    ? 'bg-primary text-primary-foreground'
+                                                                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                            )}
+                                                        >
+                                                            {item.href && item.href !== '#' ? (
+                                                                <Link
+                                                                    href={item.href}
+                                                                    target={item.target}
+                                                                    onClick={() => setMobileOpen(false)}
+                                                                    className="flex-1 px-2 py-1.5"
+                                                                >
+                                                                    {item.label}
+                                                                </Link>
+                                                            ) : (
+                                                                <span className="flex-1 px-2 py-1.5 select-none">
+                                                                    {item.label}
+                                                                </span>
+                                                            )}
+                                                            <CollapsibleTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className={cn(
+                                                                        'size-8 p-0 text-inherit hover:bg-transparent',
+                                                                        active ? 'hover:bg-primary-foreground/10' : ''
+                                                                    )}
+                                                                    aria-label={`${item.label} almenü kibontása`}
+                                                                >
+                                                                    <ChevronDown className="size-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                                                                </Button>
+                                                            </CollapsibleTrigger>
+                                                        </div>
+
+                                                        <CollapsibleContent className="space-y-1 pl-3 pt-1 ml-3 border-l-2 border-border/60 text-left">
+                                                            {item.href && item.href !== '#' && (
+                                                                <Link
+                                                                    href={item.href}
+                                                                    target={item.target}
+                                                                    onClick={() => setMobileOpen(false)}
+                                                                    className={cn(
+                                                                        'flex items-center justify-start text-left rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                                                                        active
+                                                                            ? 'bg-primary/10 text-primary font-bold'
+                                                                            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                                    )}
+                                                                >
+                                                                    <span className="text-left">{item.label} (Főoldal)</span>
+                                                                </Link>
+                                                            )}
+                                                            {item.children!.map((child, childIdx) => {
+                                                                const childActive = isLinkActive(child.href);
+                                                                return (
+                                                                    <Link
+                                                                        key={child.id ?? `mobile-child-${childIdx}`}
+                                                                        href={child.href}
+                                                                        target={child.target}
+                                                                        onClick={() => setMobileOpen(false)}
+                                                                        className={cn(
+                                                                            'flex items-center justify-between text-left gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                                                                            childActive
+                                                                                ? 'bg-primary/10 text-primary font-bold'
+                                                                                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                                        )}
+                                                                    >
+                                                                        <span className="text-left">{child.label}</span>
+                                                                        {childActive && (
+                                                                            <Badge
+                                                                                variant="outline"
+                                                                                className="h-4 border-primary/30 text-[9px] text-primary shrink-0"
+                                                                            >
+                                                                                Aktív
+                                                                            </Badge>
+                                                                        )}
+                                                                    </Link>
+                                                                );
+                                                            })}
+                                                        </CollapsibleContent>
+                                                    </Collapsible>
+                                                );
+                                            }
+
                                             return (
                                                 <Link
-                                                    key={item.href}
+                                                    key={item.id ?? `mobile-nav-${idx}`}
                                                     href={item.href}
+                                                    target={item.target}
                                                     onClick={() => setMobileOpen(false)}
                                                     className={cn(
                                                         'flex items-center justify-between rounded-md px-3 py-2 text-sm font-semibold transition-colors',

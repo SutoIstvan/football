@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-import PublicHeader from '@/components/public-header';
+import PublicHeader, { NavigationItem } from '@/components/public-header';
 
 interface SharedProps {
     clubSettings?: {
@@ -25,8 +25,8 @@ interface SharedProps {
         tiktok: string;
     };
     navigation?: {
-        header: Array<{ id: number; title: string; url?: string; route_name?: string }>;
-        footer: Array<{ id: number; title: string; url?: string; route_name?: string }>;
+        header: NavigationItem[];
+        footer: NavigationItem[];
     };
     auth?: {
         user?: { name: string; email: string };
@@ -121,7 +121,7 @@ export default function PublicLayout({
                             <h4 className="text-white font-bold text-sm uppercase tracking-wider mb-4 border-b border-emerald-900 pb-2">
                                 Navigáció
                             </h4>
-                            <ul className="space-y-2 text-sm">
+                            <ul className="space-y-2">
                                 <li>
                                     <Link href="/hirek" className="hover:text-amber-400 transition flex items-center gap-1.5">
                                         <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Hírek & Események

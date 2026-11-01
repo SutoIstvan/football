@@ -14,15 +14,26 @@ class MenuItemForm
         return $schema
             ->components([
                 TextInput::make('title')
+                    ->label('Cím')
                     ->required(),
                 TextInput::make('url')
-                    ->url(),
-                TextInput::make('route_name'),
+                    ->label('Egyéni URL (pl. /tortenet vagy https://...)'),
+                TextInput::make('route_name')
+                    ->label('Útvonal neve (pl. team.index, articles.index)'),
                 Select::make('parent_id')
-                    ->relationship('parent', 'title'),
-                TextInput::make('location')
-                    ->required()
-                    ->default('header'),
+                    ->label('Szülő menüpont (almenühöz)')
+                    ->relationship('parent', 'title')
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
+                Select::make('location')
+                    ->label('Elhelyezkedés')
+                    ->options([
+                        'header' => 'Fejléc (Főmenü)',
+                        'footer' => 'Lábléc (Footer)',
+                    ])
+                    ->default('header')
+                    ->required(),
                 TextInput::make('sort_order')
                     ->required()
                     ->numeric()

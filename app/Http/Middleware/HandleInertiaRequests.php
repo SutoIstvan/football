@@ -44,7 +44,13 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'navigation' => [
-                'header' => MenuItem::query()->active()->header()->roots()->with('children')->get(),
+                'header' => MenuItem::query()
+                    ->active()
+                    ->header()
+                    ->roots()
+                    ->with(['children' => fn ($query) => $query->active()->ordered()])
+                    ->ordered()
+                    ->get(),
                 'footer' => MenuItem::query()->active()->footer()->ordered()->get(),
             ],
             'clubSettings' => [

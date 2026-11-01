@@ -22,6 +22,10 @@ class MenuItem extends Model
         'opens_in_new_tab',
     ];
 
+    protected $appends = [
+        'resolved_url',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -68,8 +72,8 @@ class MenuItem extends Model
 
     public function getResolvedUrlAttribute(): string
     {
-        if ($this->route_name) {
-            return route($this->route_name);
+        if ($this->route_name && \Illuminate\Support\Facades\Route::has($this->route_name)) {
+            return route($this->route_name, [], false);
         }
 
         return $this->url ?? '#';
