@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Info, MapPin, Phone, Shield } from 'lucide-react';
 import React from 'react';
 import PublicLayout from '../layouts/public-layout';
+import { storageUrl } from '../lib/utils';
 
 interface PageProps {
     page: {
@@ -46,7 +47,7 @@ export default function StaticPageView({ page }: PageProps) {
                 {page.featured_image && (
                     <div className="rounded-3xl overflow-hidden shadow-xl aspect-video max-h-[440px] bg-slate-900">
                         <img
-                            src={page.featured_image}
+                            src={storageUrl(page.featured_image)}
                             alt={page.title}
                             className="w-full h-full object-cover"
                         />

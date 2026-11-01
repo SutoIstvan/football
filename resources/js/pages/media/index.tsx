@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Camera, Image as ImageIcon, Play, Video } from 'lucide-react';
 import React from 'react';
 import PublicLayout from '../../layouts/public-layout';
+import { storageUrl } from '../../lib/utils';
 
 interface GalleryItem {
     id: number;
@@ -53,7 +54,7 @@ export default function MediaIndex({ galleries }: MediaPageProps) {
                                 <div className="relative aspect-video bg-slate-900 overflow-hidden flex items-center justify-center">
                                     {gal.cover_image ? (
                                         <img
-                                            src={gal.cover_image}
+                                            src={storageUrl(gal.cover_image)}
                                             alt={gal.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                         />

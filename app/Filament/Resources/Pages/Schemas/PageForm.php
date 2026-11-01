@@ -48,10 +48,13 @@ class PageForm
                 FileUpload::make('featured_image')
                     ->label('Fejléc kép')
                     ->image()
+                    ->disk('public')
                     ->directory('pages')
                     ->columnSpanFull(),
                 RichEditor::make('content')
                     ->label('Tartalom')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('pages/attachments')
                     ->columnSpanFull(),
                 TextInput::make('meta_title')
                     ->label('SEO Cím'),

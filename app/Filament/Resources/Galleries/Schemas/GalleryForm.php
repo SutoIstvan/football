@@ -23,7 +23,9 @@ class GalleryForm
                 Textarea::make('description')
                     ->columnSpanFull(),
                 FileUpload::make('cover_image')
-                    ->image(),
+                    ->image()
+                    ->disk('public')
+                    ->directory('galleries'),
                 TextInput::make('type')
                     ->required()
                     ->default('photo'),

@@ -59,4 +59,16 @@ class Gallery extends Model
     {
         return $query->where('type', 'video');
     }
+
+    public function toArray(): array
+    {
+        $attributes = parent::toArray();
+        if (!empty($attributes['cover_image'])) {
+            $img = $attributes['cover_image'];
+            if (!str_starts_with($img, 'http://') && !str_starts_with($img, 'https://') && !str_starts_with($img, '/')) {
+                $attributes['cover_image'] = '/storage/' . $img;
+            }
+        }
+        return $attributes;
+    }
 }

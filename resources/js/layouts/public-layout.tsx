@@ -169,11 +169,10 @@ export default function PublicLayout({
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`px-3.5 py-2 rounded-lg text-sm font-bold tracking-wide transition relative ${
-                                        isActive
-                                            ? 'text-white bg-emerald-900/60 shadow-inner'
-                                            : 'text-emerald-100 hover:text-white hover:bg-emerald-700/60'
-                                    }`}
+                                    className={`px-3.5 py-2 rounded-lg text-sm font-bold tracking-wide transition relative ${isActive
+                                        ? 'text-white bg-emerald-900/60 shadow-inner'
+                                        : 'text-emerald-100 hover:text-white hover:bg-emerald-700/60'
+                                        }`}
                                 >
                                     {item.label}
                                     {isActive && (

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import PublicLayout from '../layouts/public-layout';
+import { storageUrl } from '../lib/utils';
 
 interface ArticleItem {
     id: number;
@@ -133,7 +134,7 @@ export default function Home({
                                 
                                 {mainHero.featured_image ? (
                                     <img
-                                        src={mainHero.featured_image}
+                                        src={storageUrl(mainHero.featured_image)}
                                         alt={mainHero.title}
                                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700"
                                     />
@@ -191,7 +192,7 @@ export default function Home({
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-emerald-950/30 z-10" />
                                     {art.featured_image && (
                                         <img
-                                            src={art.featured_image}
+                                            src={storageUrl(art.featured_image)}
                                             alt={art.title}
                                             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                         />
@@ -382,7 +383,7 @@ export default function Home({
                                     <div className="relative aspect-video bg-slate-100 overflow-hidden">
                                         {article.featured_image ? (
                                             <img
-                                                src={article.featured_image}
+                                                src={storageUrl(article.featured_image)}
                                                 alt={article.title}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                             />

@@ -56,6 +56,7 @@ class ArticleForm
                 FileUpload::make('featured_image')
                     ->label('Kiemelt kép')
                     ->image()
+                    ->disk('public')
                     ->directory('articles')
                     ->columnSpanFull(),
                 Textarea::make('excerpt')
@@ -64,6 +65,8 @@ class ArticleForm
                     ->columnSpanFull(),
                 RichEditor::make('content')
                     ->label('Tartalom')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('articles/attachments')
                     ->required()
                     ->columnSpanFull(),
                 Toggle::make('is_featured')

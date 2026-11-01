@@ -79,4 +79,23 @@ class Article extends Model
     {
         $this->increment('views_count');
     }
+
+    protected function content(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn (?string $value) => $value ? str_replace('http://localhost:8000/storage', '/storage', $value) : $value,
+        );
+    }
+
+    public function toArray(): array
+    {
+        $attributes = parent::toArray();
+        if (!empty($attributes['featured_image'])) {
+            $img = $attributes['featured_image'];
+            if (!str_starts_with($img, 'http://') && !str_starts_with($img, 'https://') && !str_starts_with($img, '/')) {
+                $attributes['featured_image'] = '/storage/' . $img;
+            }
+        }
+        return $attributes;
+    }
 }

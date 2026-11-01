@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Calendar, ChevronRight, Eye, Search, Tag as TagIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import PublicLayout from '../../layouts/public-layout';
+import { storageUrl } from '../../lib/utils';
 
 interface ArticleItem {
     id: number;
@@ -140,7 +141,7 @@ export default function NewsIndex({
                                 <div className="relative aspect-video bg-slate-100 overflow-hidden">
                                     {art.featured_image ? (
                                         <img
-                                            src={art.featured_image}
+                                            src={storageUrl(art.featured_image)}
                                             alt={art.title}
                                             className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                         />

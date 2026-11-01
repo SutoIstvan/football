@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import PublicLayout from '../../layouts/public-layout';
+import { storageUrl } from '../../lib/utils';
 
 interface ArticleDetailProps {
     article: {
@@ -126,7 +127,7 @@ export default function ArticleShow({ article, relatedArticles }: ArticleDetailP
                 {article.featured_image && (
                     <div className="rounded-3xl overflow-hidden shadow-xl aspect-video max-h-[480px] bg-slate-900">
                         <img
-                            src={article.featured_image}
+                            src={storageUrl(article.featured_image)}
                             alt={article.title}
                             className="w-full h-full object-cover"
                         />
@@ -196,7 +197,7 @@ export default function ArticleShow({ article, relatedArticles }: ArticleDetailP
                                     <div className="aspect-video bg-slate-100 relative overflow-hidden">
                                         {rel.featured_image ? (
                                             <img
-                                                src={rel.featured_image}
+                                                src={storageUrl(rel.featured_image)}
                                                 alt={rel.title}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition"
                                             />
