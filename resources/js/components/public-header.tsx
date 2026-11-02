@@ -1,6 +1,5 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
-    Calendar,
     ChevronDown,
     Facebook,
     Globe,
@@ -9,7 +8,9 @@ import {
     MapPin,
     Menu,
     Phone,
+    Search,
     Shield,
+    X,
     Youtube,
 } from 'lucide-react';
 import React, { useState } from 'react';
@@ -21,6 +22,14 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
     Sheet,
@@ -163,6 +172,31 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
     const currentPath = page.url || (typeof window !== 'undefined' ? window.location.pathname : '/');
     const [mobileOpen, setMobileOpen] = useState(false);
 
+    const initialQuery = React.useMemo(() => {
+        if (!page.url) return '';
+        try {
+            const urlObj = new URL(page.url, 'http://localhost');
+            return urlObj.searchParams.get('q') || '';
+        } catch {
+            return '';
+        }
+    }, [page.url]);
+
+    const [searchQuery, setSearchQuery] = useState(initialQuery);
+    const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+
+    React.useEffect(() => {
+        setSearchQuery(initialQuery);
+    }, [initialQuery]);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmed = searchQuery.trim();
+        router.get('/hirek', trimmed ? { q: trimmed } : undefined);
+        setMobileOpen(false);
+        setSearchDialogOpen(false);
+    };
+
     const clubSettings: Required<ClubSettings> = {
         name: initialClubSettings?.name || 'Paksi FC',
         tagline: initialClubSettings?.tagline || 'A magyar csapat',
@@ -248,7 +282,7 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
 
                         {/* Top row: Utility bar with small icons and text */}
                         <div className="flex w-full items-center justify-between gap-3.5 border-b border-border/60 py-2 text-xs text-muted-foreground">
-                            <div className="font-bold text-[#41ad49] ml-3 text-xl">A MAGYAR CSAPAT</div>
+                            <div className="font-bold text-[#41ad49] ml-3 text-xl">PAKSI FC A MAGYAR CSAPAT</div>
 
 
 
@@ -449,34 +483,77 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                 })}
                             </nav>
 
-                            {/* Action CTA button */}
-                            <div className="ml-4 flex shrink-0 items-center gap-2">
-                                <Button
-                                    size="sm"
-                                    asChild
-                                    className="h-8 gap-1.5 px-3.5 text-xs font-bold shadow-xs bg-[#006B3F] hover:bg-[#005432] text-white"
-                                >
-                                    <Link href="/merkozesek">
-                                        <Calendar className="size-3.5 text-amber-300" />
-                                        <span>Meccsek</span>
-                                    </Link>
-                                </Button>
+                            {/* Search input (shadcn) */}
+                            <div className="ml-4 flex shrink-0 items-center">
+                                <form onSubmit={handleSearch} className="relative flex items-center">
+                                    <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        type="search"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Keresés..."
+                                        className="h-8 w-44 rounded-md bg-muted/40 pl-8 pr-7 text-xs transition-all duration-200 hover:bg-muted/70 focus:w-60 focus:bg-background xl:w-52 [&::-webkit-search-cancel-button]:hidden"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchQuery('')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                                            aria-label="Keresés törlése"
+                                        >
+                                            <X className="size-3" />
+                                        </button>
+                                    )}
+                                </form>
                             </div>
                         </div>
                     </div>
 
                     {/* MOBILE / TABLET CONTROLS */}
                     <div className="flex items-center gap-2 lg:hidden">
-                        <Button
-                            size="sm"
-                            asChild
-                            className="h-8 gap-1 px-2.5 text-xs font-bold bg-[#006B3F] hover:bg-[#005432] text-white"
-                        >
-                            <Link href="/merkozesek">
-                                <Calendar className="size-3.5 text-amber-300" />
-                                <span className="hidden sm:inline">Meccsek</span>
-                            </Link>
-                        </Button>
+                        <Dialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="size-9"
+                                    aria-label="Keresés megnyitása"
+                                >
+                                    <Search className="size-4 text-muted-foreground" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="p-5 sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle className="text-base font-semibold">Keresés</DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={handleSearch} className="relative mt-2 flex gap-2">
+                                    <div className="relative flex-1">
+                                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            type="search"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Keresés a hírekben..."
+                                            className="h-10 pl-9 pr-8 text-sm [&::-webkit-search-cancel-button]:hidden"
+                                            autoFocus
+                                        />
+                                        {searchQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setSearchQuery('')}
+                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                                                aria-label="Keresés törlése"
+                                            >
+                                                <X className="size-4" />
+                                            </button>
+                                        )}
+                                    </div>
+                                    <Button type="submit" className="h-10 px-4 bg-[#006B3F] hover:bg-[#005432] text-white">
+                                        Keresés
+                                    </Button>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
 
                         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                             <SheetTrigger asChild>
@@ -512,6 +589,28 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                     </SheetHeader>
 
                                     <Separator />
+
+                                    {/* Mobile Drawer Search */}
+                                    <form onSubmit={handleSearch} className="relative">
+                                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            type="search"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Keresés a hírekben..."
+                                            className="h-9 pl-9 pr-8 text-xs [&::-webkit-search-cancel-button]:hidden"
+                                        />
+                                        {searchQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setSearchQuery('')}
+                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                                                aria-label="Keresés törlése"
+                                            >
+                                                <X className="size-3.5" />
+                                            </button>
+                                        )}
+                                    </form>
 
                                     {/* Navigation links */}
                                     <nav className="flex flex-col space-y-1">
