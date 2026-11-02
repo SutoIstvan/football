@@ -10,6 +10,9 @@ class EditMenuItem extends EditRecord
 {
     protected static string $resource = MenuItemResource::class;
 
+    protected static ?string $title = 'Menüpont szerkesztése';
+    protected static ?string $breadcrumb = 'Szerkesztés';
+
     protected function getHeaderActions(): array
     {
         return [

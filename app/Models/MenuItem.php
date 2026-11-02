@@ -13,6 +13,8 @@ class MenuItem extends Model
 
     protected $fillable = [
         'title',
+        'link_type',
+        'page_id',
         'url',
         'route_name',
         'parent_id',
@@ -38,6 +40,11 @@ class MenuItem extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(MenuItem::class, 'parent_id');
+    }
+
+    public function page(): BelongsTo
+    {
+        return $this->belongsTo(Page::class, 'page_id');
     }
 
     public function children(): HasMany
@@ -72,8 +79,22 @@ class MenuItem extends Model
 
     public function getResolvedUrlAttribute(): string
     {
-        if ($this->route_name && \Illuminate\Support\Facades\Route::has($this->route_name)) {
-            return route($this->route_name, [], false);
+        if ($this->link_type === 'page' && $this->page) {
+            return '/' . ltrim($this->page->slug, '/');
+        }
+
+        if ($this->link_type === 'none') {
+            return '#';
+        }
+
+        if (($this->link_type === 'route' || empty($this->link_type)) && $this->route_name) {
+            if (\Illuminate\Support\Facades\Route::has($this->route_name)) {
+                return route($this->route_name, [], false);
+            }
+        }
+
+        if ($this->page_id && $this->page) {
+            return '/' . ltrim($this->page->slug, '/');
         }
 
         return $this->url ?? '#';

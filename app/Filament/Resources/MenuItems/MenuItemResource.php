@@ -18,9 +18,12 @@ class MenuItemResource extends Resource
 {
     protected static ?string $model = MenuItem::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string | \UnitEnum | null $navigationGroup = 'Adminisztracio';
-    protected static ?string $navigationLabel = 'Menukezelo';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBars3;
+    protected static string | \UnitEnum | null $navigationGroup = 'Oldalak & Menü';
+    protected static ?string $navigationLabel = 'Menükezelő';
+    protected static ?string $modelLabel = 'Menüpont';
+    protected static ?string $pluralModelLabel = 'Menüpontok';
+    protected static ?string $breadcrumb = 'Menükezelő';
     protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema

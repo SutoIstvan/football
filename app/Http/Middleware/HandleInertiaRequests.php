@@ -48,10 +48,18 @@ class HandleInertiaRequests extends Middleware
                     ->active()
                     ->header()
                     ->roots()
-                    ->with(['children' => fn ($query) => $query->active()->ordered()])
+                    ->with([
+                        'page',
+                        'children' => fn ($query) => $query->active()->ordered()->with('page'),
+                    ])
                     ->ordered()
                     ->get(),
-                'footer' => MenuItem::query()->active()->footer()->ordered()->get(),
+                'footer' => MenuItem::query()
+                    ->active()
+                    ->footer()
+                    ->with('page')
+                    ->ordered()
+                    ->get(),
             ],
             'clubSettings' => [
                 'name' => 'Paksi FC',

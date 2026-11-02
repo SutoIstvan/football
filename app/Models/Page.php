@@ -42,6 +42,11 @@ class Page extends Model
         return $this->hasMany(Page::class, 'parent_id')->orderBy('sort_order');
     }
 
+    public function menuItems(): HasMany
+    {
+        return $this->hasMany(MenuItem::class, 'page_id');
+    }
+
     public function scopePublished($query)
     {
         return $query->where('is_published', true);

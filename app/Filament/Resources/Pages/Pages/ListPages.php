@@ -10,10 +10,14 @@ class ListPages extends ListRecords
 {
     protected static string $resource = PageResource::class;
 
+    protected static ?string $title = 'Oldalak';
+    protected static ?string $breadcrumb = 'Lista';
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->label('Új oldal hozzáadása'),
         ];
     }
 }

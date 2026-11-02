@@ -156,26 +156,43 @@ export default function PublicLayout({
                                 Információk
                             </h4>
                             <ul className="space-y-2 text-sm">
-                                <li>
-                                    <Link href="/stadion" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                                        <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Fehérvári úti Stadion
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href="/tortenet" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                                        <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Klubtörténet (1952)
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href="/tamogatok" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                                        <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Kiemelt Támogatók
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href="/kapcsolat" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                                        <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Elérhetőségek
-                                    </Link>
-                                </li>
+                                {props.navigation?.footer && props.navigation.footer.length > 0 ? (
+                                    props.navigation.footer.map((item) => (
+                                        <li key={item.id}>
+                                            <Link
+                                                href={item.resolved_url || item.url || '#'}
+                                                target={item.opens_in_new_tab ? '_blank' : undefined}
+                                                rel={item.opens_in_new_tab ? 'noreferrer' : undefined}
+                                                className="hover:text-amber-400 transition flex items-center gap-1.5"
+                                            >
+                                                <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> {item.title}
+                                            </Link>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <>
+                                        <li>
+                                            <Link href="/stadion" className="hover:text-amber-400 transition flex items-center gap-1.5">
+                                                <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Fehérvári úti Stadion
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/tortenet" className="hover:text-amber-400 transition flex items-center gap-1.5">
+                                                <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Klubtörténet (1952)
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/tamogatok" className="hover:text-amber-400 transition flex items-center gap-1.5">
+                                                <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Kiemelt Támogatók
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/kapcsolat" className="hover:text-amber-400 transition flex items-center gap-1.5">
+                                                <ChevronRight className="w-3.5 h-3.5 text-emerald-500" /> Elérhetőségek
+                                            </Link>
+                                        </li>
+                                    </>
+                                )}
                             </ul>
                         </div>
 

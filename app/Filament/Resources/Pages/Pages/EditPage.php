@@ -10,6 +10,9 @@ class EditPage extends EditRecord
 {
     protected static string $resource = PageResource::class;
 
+    protected static ?string $title = 'Oldal szerkesztése';
+    protected static ?string $breadcrumb = 'Szerkesztés';
+
     protected function getHeaderActions(): array
     {
         return [

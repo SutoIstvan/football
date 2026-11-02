@@ -18,10 +18,13 @@ class PageResource extends Resource
 {
     protected static ?string $model = Page::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    protected static string | \UnitEnum | null $navigationGroup = 'Csapat & Klub';
-    protected static ?string $navigationLabel = 'Oldalak (Pages)';
-    protected static ?int $navigationSort = 4;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+    protected static string | \UnitEnum | null $navigationGroup = 'Oldalak & Menü';
+    protected static ?string $navigationLabel = 'Oldalak';
+    protected static ?string $modelLabel = 'Oldal';
+    protected static ?string $pluralModelLabel = 'Oldalak';
+    protected static ?string $breadcrumb = 'Oldalak';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
