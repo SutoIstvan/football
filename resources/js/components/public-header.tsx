@@ -248,43 +248,23 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
 
                         {/* Top row: Utility bar with small icons and text */}
                         <div className="flex w-full items-center justify-between gap-3.5 border-b border-border/60 py-2 text-xs text-muted-foreground">
-                            <div className="font-extrabold text-green-700 ml-3 text-xl">A MAGYAR CSAPAT</div>
+                            <div className="font-bold text-[#41ad49] ml-3 text-xl">A MAGYAR CSAPAT</div>
 
 
-
-
-
-
-
-
-
-                            {/* Separator */}
-                            <Separator orientation="vertical" className="hidden h-3 xl:block" />
-
-                            {/* Address */}
-                            {clubSettings.address && (
-                                <span
-                                    className="hidden items-center gap-1.5 transition-colors hover:text-foreground xl:inline-flex"
-                                    title="Cím"
-                                >
-                                    <MapPin className="size-3.5 text-primary" />
-                                    <span className="font-medium">{clubSettings.address}</span>
-                                </span>
-                            )}
 
                             {/* Separator */}
                             <Separator orientation="vertical" className="h-3" />
 
                             {/* Social Media Links with Tooltips */}
                             <TooltipProvider delayDuration={200}>
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-6">
                                     {clubSettings.facebook && (
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="size-7 text-muted-foreground hover:text-foreground"
+                                                    className="size-7 text-muted-foreground hover:text-green-600"
                                                     asChild
                                                 >
                                                     <a
@@ -307,7 +287,7 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="size-7 text-muted-foreground hover:text-foreground"
+                                                    className="size-7 text-muted-foreground hover:text-green-600"
                                                     asChild
                                                 >
                                                     <a
@@ -330,7 +310,7 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="size-7 text-muted-foreground hover:text-foreground"
+                                                    className="size-7 text-muted-foreground hover:text-green-600"
                                                     asChild
                                                 >
                                                     <a
@@ -353,7 +333,7 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="size-7 text-muted-foreground hover:text-foreground"
+                                                    className="size-7 text-muted-foreground hover:text-green-600"
                                                     asChild
                                                 >
                                                     <a
@@ -393,7 +373,7 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                                     href={item.href || '#'}
                                                     target={item.target}
                                                     className={cn(
-                                                        'inline-flex h-8 items-center justify-center gap-1 rounded-md px-3 text-xs font-semibold tracking-wide transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring select-none',
+                                                        'inline-flex h-8 items-center justify-center gap-1 rounded-md px-3 text-sm tracking-wide transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring select-none',
                                                         active
                                                             ? 'bg-primary text-primary-foreground shadow-xs'
                                                             : 'text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground'
@@ -436,7 +416,7 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                                                         href={child.href}
                                                                         target={child.target}
                                                                         className={cn(
-                                                                            'flex w-full items-center justify-start text-left gap-3 rounded-md px-3 py-2 text-xs font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                                                                            'flex w-full items-center justify-start text-left gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
                                                                             childActive && 'bg-primary/10 text-primary font-bold'
                                                                         )}
                                                                     >
@@ -457,10 +437,10 @@ export function PublicHeader({ clubSettings: initialClubSettings, navigation }: 
                                             href={item.href}
                                             target={item.target}
                                             className={cn(
-                                                'inline-flex h-8 items-center justify-center rounded-md px-3 text-xs font-semibold tracking-wide transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring select-none',
+                                                'inline-flex h-8 items-center justify-center rounded-md px-3 text-sm tracking-wide transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring select-none',
                                                 active
-                                                    ? 'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90'
-                                                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                    ? 'bg-gray-100 shadow-xs hover:bg-gray-400'
+                                                    : 'text-gray-600 hover:bg-accent hover:text-accent-foreground'
                                             )}
                                         >
                                             {item.label}
